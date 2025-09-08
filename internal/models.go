@@ -5,22 +5,28 @@ import "time"
 const TaskTableName = "tasks"
 
 type Task struct {
-	ID          int64     `json:"id"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	DueDate     time.Time `json:"due_date"`
-	Priority    int64     `json:"priority"`
-	Points      int64     `json:"points"`
-	UserID      int64     `json:"user_id"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID          int       `json:"id,omitempty"`
+	Title       string    `json:"title,omitempty"`
+	Description string    `json:"description,omitempty"`
+	DueDate     time.Time `json:"due_date,omitempty"`
+	Priority    int       `json:"priority,omitempty"`
+	Points      int       `json:"points,omitempty"`
+	UserID      int       `json:"user_id,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
 }
 
 const UserTableName = "users"
 
 type User struct {
-	ID          int64     `json:"id"`
-	Name        string    `json:"name"`
-	UUID        string    `json:"uuid"`
-	TotalPoints int64     `json:"total_points"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID          int       `json:"id,omitempty"`
+	Name        string    `json:"name,omitempty"`
+	UUID        string    `json:"uuid,omitempty"`
+	TotalPoints int       `json:"total_points,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
 }
+
+// Returns a boolean that is True if the due date of a task is past
+func (t *Task) IsOverdue() bool {
+	return t.DueDate.Before(time.Now())
+}
+

@@ -1,19 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	i "taskmaster/internal"
+
+	gin "github.com/gin-gonic/gin"
 )
 
 func main() {
-	client, err := i.CreateSupabaseClient()
+	// Connect to supabase bucket
+	sbClient, err := i.CreateSupabaseClient()
 	if err != nil {
 		log.Fatalf("Error creating supabase client: %v", err)
 	}
-	user, err := client.GetUserById(1)
+
+	// start gin client
+	ginClient := gin.Default()
 	if err != nil {
-		log.Fatalf("Error getting all users: %v", err)
+		log.Fatalf("Error starting gin client: %v", err)
 	}
-	fmt.Println(*user)
+
+	tasksGroup := ginClient.Group("/api/v1/tasks")
+	{
+		tasksGroup.GET("/byuser/:id", func(c *gin.Context) { i.HandleGetTasksByUserId(c)(sbClient) })
+	}
+	ginClient.Run(":3000")
 }

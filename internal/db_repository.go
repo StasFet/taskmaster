@@ -50,6 +50,22 @@ func (s *SupabaseClient) GetAllTasks() (*[]Task, error) {
 	return &result, nil
 }
 
+// Create new user
+func (s *SupabaseClient) CreateNewUser(u *User) (*User, error) {
+	client := s.GetClient()
+	data, count, err := client.From(UserTableName).Insert(u, false, "", "", "exact").Execute()
+	if err != nil {
+		return nil, err
+	} else if count != 1 {
+		return nil, errors.New("create new user failed: supabase returned count > 1")
+	}
+	result := []User{}
+	if err := json.Unmarshal(data, &result); err != nil {
+		return nil, err
+	}
+	return &result[0], nil
+}
+
 // Returns a Task object with the provided id
 func (s *SupabaseClient) GetTaskById(id int) (*Task, error) {
 	client := s.GetClient()
@@ -78,4 +94,20 @@ func (s *SupabaseClient) GetTasksByUserId(id int) (*[]Task, error) {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// Inserts the provided task into the database. Returns the created task
+func (s *SupabaseClient) CreateNewTask(newTask *Task) (*Task, error) {
+	client := s.GetClient()
+	data, count, err := client.From(TaskTableName).Insert(newTask, false, "", "", "exact").Execute()
+	if err != nil {
+		return nil, err
+	} else if count != 1 {
+		return nil, errors.New("insertion failed: count was not 1")
+	}
+	result := []Task{}
+	if err := json.Unmarshal(data, &result); err != nil {
+		return nil, err
+	}
+	return &result[0], nil
 }
