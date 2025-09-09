@@ -18,7 +18,6 @@ type Task struct {
 const UserTableName = "users"
 
 type User struct {
-	ID          int       `json:"-"`
 	Name        string    `json:"name,omitempty"`
 	UUID        string    `json:"uuid,omitempty"`
 	TotalPoints int       `json:"total_points,omitempty"`

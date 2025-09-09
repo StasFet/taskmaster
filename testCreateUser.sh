@@ -1,0 +1,1 @@
+curl --header "Content-Type: application/json" --request POST --data '{"name": "Edward Beaming", "total_points": 0, "uuid": "a9474069-456e-40b6-a049-70673900eb14"}' http://localhost:3000/api/v1/users/

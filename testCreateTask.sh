@@ -1,1 +1,1 @@
-curl --header "Content-Type: application/json" --request POST --data '{"title": "Edward Lol", "description": "edward beaman task", "user_id": 1}' http://localhost:3000/api/v1/tasks/
+curl --header "Content-Type: application/json" --request POST --data '{"title": "Edward Lol", "description": "edward beaman task", "user_id": 3}' http://localhost:3000/api/v1/tasks/

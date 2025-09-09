@@ -1,0 +1,12 @@
+[DB] 08:32:55 main.go:18: Supabase client made successfully
+[DB] 08:33:38 main.go:18: Supabase client made successfully
+[DB] 08:38:12 main.go:18: Supabase client made successfully
+[DB] 08:38:23 api_user_handlers.go:27: No user exists with id 2
+[DB] 08:39:43 api_user_handlers.go:27: No user exists with id 2
+[DB] 08:39:47 main.go:18: Supabase client made successfully
+[DB] 08:39:52 api_user_handlers.go:29: No user exists with id 2
+[API] 08:39:58 api_user_handlers.go:16: Error extracting ID from params
+[DB] 08:55:06 main.go:18: Supabase client made successfully
+[DB] 08:56:24 main.go:18: Supabase client made successfully
+[DB] 09:00:40 main.go:18: Supabase client made successfully
+[DB] 09:00:58 api_task_handlers.go:61: error creating new task into supabase: (23503) insert or update on table "tasks" violates foreign key constraint "tasks_user_id_fkey"

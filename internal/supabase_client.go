@@ -2,8 +2,6 @@ package internal
 
 import (
 	"os"
-
-	dotenv "github.com/joho/godotenv"
 	"github.com/supabase-community/supabase-go"
 )
 
@@ -12,10 +10,6 @@ type SupabaseClient struct {
 }
 
 func CreateSupabaseClient() (*SupabaseClient, error) {
-	err := dotenv.Load("./.env")
-	if err != nil {
-		return nil, err
-	}
 	SUPABASE_URL := os.Getenv("SUPABASE_URL")
 	SUPABASE_KEY := os.Getenv("SUPABASE_KEY")
 	client, err := supabase.NewClient(SUPABASE_URL, SUPABASE_KEY, &supabase.ClientOptions{})

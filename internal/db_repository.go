@@ -26,8 +26,8 @@ func (s *SupabaseClient) GetUserById(id int) (*User, error) {
 	data, count, err := client.From(UserTableName).Select("*", "exact", false).Eq("id", strconv.Itoa(id)).Execute()
 	if err != nil {
 		return nil, err
-	} else if count > 1 {
-		return nil, errors.New("more than one user with provided ID found")
+	} else if count == 0 {
+		return nil, nil
 	}
 	result := []User{}
 	if err := json.Unmarshal(data, &result); err != nil {
@@ -83,9 +83,9 @@ func (s *SupabaseClient) GetTaskById(id int) (*Task, error) {
 }
 
 // Returns a slice of tasks associated with the user with the given id
-func (s *SupabaseClient) GetTasksByUserId(id int) (*[]Task, error) {
+func (s *SupabaseClient) GetTasksByUUID(uuid string) (*[]Task, error) {
 	client := s.GetClient()
-	data, _, err := client.From(TaskTableName).Select("*", "exact", false).Eq("user_id", strconv.Itoa(id)).Execute()
+	data, _, err := client.From(TaskTableName).Select("*", "exact", false).Eq("owner_uuid", uuid).Execute()
 	if err != nil {
 		return nil, err
 	}
@@ -108,6 +108,34 @@ func (s *SupabaseClient) CreateNewTask(newTask *Task) (*Task, error) {
 	result := []Task{}
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
+	}
+	return &result[0], nil
+}
+
+// Updates the task with the given id to match the given task
+func (s *SupabaseClient) UpdateTask(id int, targetTask *Task) (*Task, error) {
+	// important to note that the user can only change the following values: title, description, due date, priority and points
+	client := s.GetClient()
+	id_str := strconv.Itoa(id)
+	data, count, err := client.From(TaskTableName).Update(map[string]any{
+		"title": targetTask.Title,
+		"description": targetTask.Description,
+		"due_date": targetTask.DueDate,
+		"priority": targetTask.Priority,
+		"points": targetTask.Points,
+	}, "", "exact").Eq("id", id_str).Execute()
+
+	if err != nil {
+		return nil, err
+	} else if count == 0 {
+		return nil, errors.New("no rows were updated")
+	}
+	
+	result := []Task{}
+	if err := json.Unmarshal(data, &result); err != nil {
+		return nil, err
+	} else if len(result) == 0 {
+		return nil, errors.New("unmarshalled data from updated task had length 0")
 	}
 	return &result[0], nil
 }
