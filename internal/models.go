@@ -5,7 +5,7 @@ import "time"
 const TaskTableName = "tasks"
 
 type Task struct {
-	ID          int       `json:"id,omitempty"`
+	ID          int       `json:"-"`
 	Title       string    `json:"title,omitempty"`
 	Description string    `json:"description,omitempty"`
 	DueDate     time.Time `json:"due_date,omitempty"`
@@ -18,7 +18,7 @@ type Task struct {
 const UserTableName = "users"
 
 type User struct {
-	ID          int       `json:"id,omitempty"`
+	ID          int       `json:"-"`
 	Name        string    `json:"name,omitempty"`
 	UUID        string    `json:"uuid,omitempty"`
 	TotalPoints int       `json:"total_points,omitempty"`
@@ -29,4 +29,3 @@ type User struct {
 func (t *Task) IsOverdue() bool {
 	return t.DueDate.Before(time.Now())
 }
-

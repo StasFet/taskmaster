@@ -23,6 +23,7 @@ func main() {
 	tasksGroup := ginClient.Group("/api/v1/tasks")
 	{
 		tasksGroup.GET("/byuser/:id", func(c *gin.Context) { i.HandleGetTasksByUserId(c)(sbClient) })
+		tasksGroup.POST("/", func(c *gin.Context) { i.HandlePostTask(c)(sbClient) })
 	}
 	ginClient.Run(":3000")
 }
