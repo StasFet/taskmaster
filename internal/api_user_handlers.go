@@ -2,7 +2,6 @@ package internal
 
 import (
 	"net/http"
-	"strconv"
 	"taskmaster/logger"
 	"time"
 
@@ -10,26 +9,28 @@ import (
 )
 
 // handle GET /api/v1/users/:id - return the user with the matching id
-func HandleGetUserByID(c *gin.Context) func(s *SupabaseClient) {
-	return func(s *SupabaseClient) {
-		extractedId, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			respondError(c, http.StatusBadRequest, "error extracting id from params")
-			logger.API.Println("Error extracting ID from params")
-			return
-		}
+func HandleGetUser(s *SupabaseClient) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		uuid := c.GetString("validated_uuid")
+		name := c.GetString("validated_name")
+		email := c.GetString("validated_email")
 
 		// get user from supabase
-		user, err := s.GetUserById(extractedId)
+		user, err := s.GetUserByUUID(uuid)
 		if err != nil {
 			respondError(c, http.StatusInternalServerError, "error getting user")
 			logger.DB.Printf("error getting user from db: %v\n", err)
 			return
-		} else if user == nil {
-			// error == user == nil - means no such user exists
-			respondError(c, http.StatusNotFound, "no such user exists")
-			logger.DB.Printf("No user exists with id %v", extractedId)
-			return
+		} 
+
+		// no user exists with given uuid
+		if user == nil { 
+			user, err = s.CreateNewUser(&User{Name: name, UUID: uuid, Email: email})
+			if err != nil {
+				respondError(c, http.StatusInsufficientStorage, "Error creating new user")
+				logger.DB.Printf("error creating user for new UUID: %v\n", err)
+				return
+			}
 		}
 
 		c.JSON(http.StatusFound, user)

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strconv"
+	"time"
 )
 
 // Returns a slice of all the users in the db. Only for use in-development
@@ -21,9 +22,9 @@ func (s *SupabaseClient) GetAllUsers() (*[]User, error) {
 }
 
 // Returns a User object with the provided id
-func (s *SupabaseClient) GetUserById(id int) (*User, error) {
+func (s *SupabaseClient) GetUserByUUID(uuid string) (*User, error) {
 	client := s.GetClient()
-	data, count, err := client.From(UserTableName).Select("*", "exact", false).Eq("id", strconv.Itoa(id)).Execute()
+	data, count, err := client.From(UserTableName).Select("*", "exact", false).Eq("uuid", uuid).Execute()
 	if err != nil {
 		return nil, err
 	} else if count == 0 {
@@ -50,9 +51,10 @@ func (s *SupabaseClient) GetAllTasks() (*[]Task, error) {
 	return &result, nil
 }
 
-// Create new user
+// Create new user. Automatically sets CreatedAt
 func (s *SupabaseClient) CreateNewUser(u *User) (*User, error) {
 	client := s.GetClient()
+	u.CreatedAt = time.Now()
 	data, count, err := client.From(UserTableName).Insert(u, false, "", "", "exact").Execute()
 	if err != nil {
 		return nil, err
@@ -118,11 +120,11 @@ func (s *SupabaseClient) UpdateTask(id int, targetTask *Task) (*Task, error) {
 	client := s.GetClient()
 	id_str := strconv.Itoa(id)
 	data, count, err := client.From(TaskTableName).Update(map[string]any{
-		"title": targetTask.Title,
+		"title":       targetTask.Title,
 		"description": targetTask.Description,
-		"due_date": targetTask.DueDate,
-		"priority": targetTask.Priority,
-		"points": targetTask.Points,
+		"due_date":    targetTask.DueDate,
+		"priority":    targetTask.Priority,
+		"points":      targetTask.Points,
 	}, "", "exact").Eq("id", id_str).Execute()
 
 	if err != nil {
@@ -130,7 +132,7 @@ func (s *SupabaseClient) UpdateTask(id int, targetTask *Task) (*Task, error) {
 	} else if count == 0 {
 		return nil, errors.New("no rows were updated")
 	}
-	
+
 	result := []Task{}
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err

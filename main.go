@@ -28,14 +28,13 @@ func main() {
 	// declare handler groups/routing
 	tasksGroup := ginClient.Group("/api/v1/tasks")
 	{
-		tasksGroup.GET("/byuser/:id", func(c *gin.Context) { i.HandleGetTasksByUUID(c)(sbClient) })
-		tasksGroup.POST("/", func(c *gin.Context) { i.HandlePostTask(c)(sbClient) })
+		tasksGroup.GET("/", i.JWTValidatorMiddleware(), i.HandleGetTasksByUUID(sbClient))
+		tasksGroup.POST("/", i.JWTValidatorMiddleware(), i.HandlePostTask(sbClient))
 	}
 
 	usersGroup := ginClient.Group("/api/v1/users")
 	{
-		usersGroup.GET(":id", func(c *gin.Context) { i.HandleGetUserByID(c)(sbClient) })
-		usersGroup.POST("/", func(c *gin.Context) { i.HandlePostUser(c)(sbClient) })
+		usersGroup.GET("/", i.JWTValidatorMiddleware(), i.HandleGetUser(sbClient))
 	}
 
 	port := os.Getenv("PORT")

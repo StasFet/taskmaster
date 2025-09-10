@@ -19,6 +19,7 @@ const UserTableName = "users"
 
 type User struct {
 	Name        string    `json:"name,omitempty"`
+	Email       string    `json:"email,omitempty"`
 	UUID        string    `json:"uuid,omitempty"`
 	TotalPoints int       `json:"total_points,omitempty"`
 	CreatedAt   time.Time `json:"created_at,omitempty"`

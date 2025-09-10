@@ -15,10 +15,10 @@ func respondError(c *gin.Context, code int, text string) {
 }
 
 // handle GET /api/v1/tasks/byuser/:id
-func HandleGetTasksByUUID(c *gin.Context) func(s *SupabaseClient) {
-	return func(s *SupabaseClient) {
+func HandleGetTasksByUUID(s *SupabaseClient) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		// extract user id from request parameters
-		uuid := c.Param("uuid")
+		uuid := c.GetString("validated_uuid")
 
 		// get tasks from supabase
 		tasks, err := s.GetTasksByUUID(uuid)
@@ -36,8 +36,8 @@ func HandleGetTasksByUUID(c *gin.Context) func(s *SupabaseClient) {
 }
 
 // handle POST /api/v1/tasks - Create new task
-func HandlePostTask(c *gin.Context) func(s *SupabaseClient) {
-	return func(s *SupabaseClient) {
+func HandlePostTask(s *SupabaseClient) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		newTask := Task{}
 		// bind the json of the request to a Task object
 		if err := c.BindJSON(&newTask); err != nil {
