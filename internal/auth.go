@@ -77,5 +77,6 @@ func JWTValidatorMiddleware() gin.HandlerFunc {
 		c.Set("validated_uuid", uuid)
 		c.Set("validated_name", name)
 		c.Set("validated_email", email)
+		c.Next()
 	}
 }
