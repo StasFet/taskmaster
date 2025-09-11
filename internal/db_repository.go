@@ -141,3 +141,27 @@ func (s *SupabaseClient) UpdateTask(id int, targetTask *Task) (*Task, error) {
 	}
 	return &result[0], nil
 }
+
+// Updates the user with the given id to match the given user
+func (s *SupabaseClient) UpdateUser(uuid string, targetUser *User) (*User, error) {
+	// the user can only change the following details: name, totalpoints
+	client := s.GetClient()
+	data, count, err := client.From(UserTableName).Update(map[string]any{
+		"name": targetUser.Name,
+		"total_points": targetUser.TotalPoints,
+	}, "", "exact").Eq("uuid", uuid).Execute()
+	if err != nil {
+		return nil, errors.New("error updating user details")
+	} else if count == 0 {
+		return nil, errors.New("error updating user details: no users have been changed")
+	}
+	
+	// unmarshal user returned by supabase
+	result := []User{}
+	if err := json.Unmarshal(data, &result); err != nil {
+		return nil, err
+	} else if len(result) == 0 {
+		return nil, errors.New("updated user")
+	}
+	return &result[0], nil
+}

@@ -35,6 +35,7 @@ func main() {
 	usersGroup := ginClient.Group("/api/v1/users")
 	{
 		usersGroup.GET("/", i.JWTValidatorMiddleware(), i.HandleGetUser(sbClient))
+		usersGroup.PUT("/", i.JWTValidatorMiddleware(), i.HandlePutUser(sbClient))
 	}
 
 	port := os.Getenv("PORT")
