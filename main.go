@@ -4,6 +4,7 @@ import (
 	"os"
 	i "taskmaster/internal"
 	"taskmaster/logger"
+	"time"
 	"unicode/utf8"
 
 	"github.com/gin-contrib/cors"
@@ -25,7 +26,14 @@ func main() {
 
 	// start gin client
 	ginClient := gin.Default()
-	ginClient.Use(cors.Default())
+	ginClient.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "PUT", "POST", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	// declare handler groups/routing
 	tasksGroup := ginClient.Group("/api/v1/tasks")

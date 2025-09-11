@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"net/http"
 	"os"
 	"strings"
@@ -30,11 +31,11 @@ func ValidateClaims(token *jwt.Token) (bool, error) {
 		}
 
 		// is token not valid yet,
-		nbf := claims["nbf"].(float64)
-		notBefore := time.Unix(int64(nbf), 0)
-		if time.Now().Before(notBefore) {
-			return false, nil
-		}
+		// nbf := claims["nbf"].(float64)
+		// notBefore := time.Unix(int64(nbf), 0)
+		// if time.Now().Before(notBefore) {
+		// 	return false, nil
+		// }
 
 		// check the audience is correct (supabase sets it to "authenticated" by defauly)
 		aud := claims["aud"].(string)
@@ -52,6 +53,7 @@ func JWTValidatorMiddleware() gin.HandlerFunc {
 		authToken := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
 		logger.GEN.Printf("Recieved authorisation, here is the token: %v\n", authToken)
 		parsedToken, err := ValidateToken(authToken)
+
 		if err != nil {
 			c.JSON(http.StatusBadRequest, map[string]any{
 				"message": "authentication failed: invalid token",
@@ -60,6 +62,12 @@ func JWTValidatorMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
+		logToken, err := json.Marshal(parsedToken)
+		if err == nil {
+			logger.API.Printf("Extracted logToken: %s", logToken)
+		}
+
 		// check expiry etc
 		if isValid, err := ValidateClaims(parsedToken); !isValid || err != nil {
 			c.JSON(http.StatusForbidden, map[string]any{
