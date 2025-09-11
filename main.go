@@ -6,6 +6,7 @@ import (
 	"taskmaster/logger"
 	"unicode/utf8"
 
+	"github.com/gin-contrib/cors"
 	gin "github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -24,6 +25,7 @@ func main() {
 
 	// start gin client
 	ginClient := gin.Default()
+	ginClient.Use(cors.Default())
 
 	// declare handler groups/routing
 	tasksGroup := ginClient.Group("/api/v1/tasks")

@@ -10,3 +10,8 @@
 [DB] 08:56:24 main.go:18: Supabase client made successfully
 [DB] 09:00:40 main.go:18: Supabase client made successfully
 [DB] 09:00:58 api_task_handlers.go:61: error creating new task into supabase: (23503) insert or update on table "tasks" violates foreign key constraint "tasks_user_id_fkey"
+[GEN] 04:32:23 auth.go:58: Error validating token: token is malformed: token contains an invalid number of segments
+[GEN] 04:36:05 auth.go:58: Error validating token: token is malformed: token contains an invalid number of segments
+[GEN] 04:37:22 auth.go:58: Error validating token: token is malformed: token contains an invalid number of segments
+[GEN] 04:39:45 auth.go:53: Recieved authorisation, here is the token: 
+[GEN] 04:39:45 auth.go:59: Error validating token: token is malformed: token contains an invalid number of segments

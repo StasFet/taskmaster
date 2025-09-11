@@ -50,6 +50,7 @@ func ValidateClaims(token *jwt.Token) (bool, error) {
 func JWTValidatorMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authToken := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+		logger.GEN.Printf("Recieved authorisation, here is the token: %v\n", authToken)
 		parsedToken, err := ValidateToken(authToken)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, map[string]any{
