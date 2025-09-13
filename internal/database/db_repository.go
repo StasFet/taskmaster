@@ -1,20 +1,22 @@
-package internal
+package database
 
 import (
 	"encoding/json"
 	"errors"
 	"strconv"
 	"time"
+
+	model "taskmaster/internal/models"
 )
 
 // Returns a slice of all the users in the db. Only for use in-development
-func (s *SupabaseClient) GetAllUsers() (*[]User, error) {
+func (s *SupabaseClient) GetAllUsers() (*[]model.User, error) {
 	client := s.GetClient()
-	data, _, err := client.From(UserTableName).Select("*", "exact", false).Execute()
+	data, _, err := client.From(model.UserTableName).Select("*", "exact", false).Execute()
 	if err != nil {
 		return nil, err
 	}
-	results := []User{}
+	results := []model.User{}
 	if err := json.Unmarshal(data, &results); err != nil {
 		return nil, err
 	}
@@ -22,15 +24,15 @@ func (s *SupabaseClient) GetAllUsers() (*[]User, error) {
 }
 
 // Returns a User object with the provided id
-func (s *SupabaseClient) GetUserByUUID(uuid string) (*User, error) {
+func (s *SupabaseClient) GetUserByUUID(uuid string) (*model.User, error) {
 	client := s.GetClient()
-	data, count, err := client.From(UserTableName).Select("*", "exact", false).Eq("uuid", uuid).Execute()
+	data, count, err := client.From(model.UserTableName).Select("*", "exact", false).Eq("uuid", uuid).Execute()
 	if err != nil {
 		return nil, err
 	} else if count == 0 {
 		return nil, nil
 	}
-	result := []User{}
+	result := []model.User{}
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
 	}
@@ -38,13 +40,13 @@ func (s *SupabaseClient) GetUserByUUID(uuid string) (*User, error) {
 }
 
 // Returns all the tasks in the db. only for testing and development
-func (s *SupabaseClient) GetAllTasks() (*[]Task, error) {
+func (s *SupabaseClient) GetAllTasks() (*[]model.Task, error) {
 	client := s.GetClient()
-	data, _, err := client.From(TaskTableName).Select("*", "exact", false).Execute()
+	data, _, err := client.From(model.TaskTableName).Select("*", "exact", false).Execute()
 	if err != nil {
 		return nil, err
 	}
-	result := []Task{}
+	result := []model.Task{}
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
 	}
@@ -52,16 +54,16 @@ func (s *SupabaseClient) GetAllTasks() (*[]Task, error) {
 }
 
 // Create new user. Automatically sets CreatedAt
-func (s *SupabaseClient) CreateNewUser(u *User) (*User, error) {
+func (s *SupabaseClient) CreateNewUser(u *model.User) (*model.User, error) {
 	client := s.GetClient()
 	u.CreatedAt = time.Now()
-	data, count, err := client.From(UserTableName).Insert(u, false, "", "", "exact").Execute()
+	data, count, err := client.From(model.UserTableName).Insert(u, false, "", "", "exact").Execute()
 	if err != nil {
 		return nil, err
 	} else if count != 1 {
 		return nil, errors.New("create new user failed: supabase returned count > 1")
 	}
-	result := []User{}
+	result := []model.User{}
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
 	}
@@ -69,15 +71,15 @@ func (s *SupabaseClient) CreateNewUser(u *User) (*User, error) {
 }
 
 // Returns a Task object with the provided id
-func (s *SupabaseClient) GetTaskById(id int) (*Task, error) {
+func (s *SupabaseClient) GetTaskById(id int) (*model.Task, error) {
 	client := s.GetClient()
-	data, count, err := client.From(TaskTableName).Select("*", "exact", false).Eq("id", strconv.Itoa(id)).Execute()
+	data, count, err := client.From(model.TaskTableName).Select("*", "exact", false).Eq("id", strconv.Itoa(id)).Execute()
 	if err != nil {
 		return nil, err
 	} else if count > 1 {
 		return nil, errors.New("more than one task with provided ID found")
 	}
-	results := []Task{}
+	results := []model.Task{}
 	if err := json.Unmarshal(data, &results); err != nil {
 		return nil, err
 	}
@@ -85,13 +87,13 @@ func (s *SupabaseClient) GetTaskById(id int) (*Task, error) {
 }
 
 // Returns a slice of tasks associated with the user with the given id
-func (s *SupabaseClient) GetTasksByUUID(uuid string) (*[]Task, error) {
+func (s *SupabaseClient) GetTasksByUUID(uuid string) (*[]model.Task, error) {
 	client := s.GetClient()
-	data, _, err := client.From(TaskTableName).Select("*", "exact", false).Eq("owner_uuid", uuid).Execute()
+	data, _, err := client.From(model.TaskTableName).Select("*", "exact", false).Eq("owner_uuid", uuid).Execute()
 	if err != nil {
 		return nil, err
 	}
-	result := []Task{}
+	result := []model.Task{}
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
 	}
@@ -99,15 +101,15 @@ func (s *SupabaseClient) GetTasksByUUID(uuid string) (*[]Task, error) {
 }
 
 // Inserts the provided task into the database. Returns the created task
-func (s *SupabaseClient) CreateNewTask(newTask *Task) (*Task, error) {
+func (s *SupabaseClient) CreateNewTask(newTask *model.Task) (*model.Task, error) {
 	client := s.GetClient()
-	data, count, err := client.From(TaskTableName).Insert(newTask, false, "", "", "exact").Execute()
+	data, count, err := client.From(model.TaskTableName).Insert(newTask, false, "", "", "exact").Execute()
 	if err != nil {
 		return nil, err
 	} else if count != 1 {
 		return nil, errors.New("insertion failed: count was not 1")
 	}
-	result := []Task{}
+	result := []model.Task{}
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
 	}
@@ -115,11 +117,11 @@ func (s *SupabaseClient) CreateNewTask(newTask *Task) (*Task, error) {
 }
 
 // Updates the task with the given id to match the given task
-func (s *SupabaseClient) UpdateTask(id int, targetTask *Task) (*Task, error) {
+func (s *SupabaseClient) UpdateTask(id int, targetTask *model.Task) (*model.Task, error) {
 	// important to note that the user can only change the following values: title, description, due date, priority and points
 	client := s.GetClient()
 	id_str := strconv.Itoa(id)
-	data, count, err := client.From(TaskTableName).Update(map[string]any{
+	data, count, err := client.From(model.TaskTableName).Update(map[string]any{
 		"title":       targetTask.Title,
 		"description": targetTask.Description,
 		"due_date":    targetTask.DueDate,
@@ -133,7 +135,7 @@ func (s *SupabaseClient) UpdateTask(id int, targetTask *Task) (*Task, error) {
 		return nil, errors.New("no rows were updated")
 	}
 
-	result := []Task{}
+	result := []model.Task{}
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
 	} else if len(result) == 0 {
@@ -143,11 +145,11 @@ func (s *SupabaseClient) UpdateTask(id int, targetTask *Task) (*Task, error) {
 }
 
 // Updates the user with the given id to match the given user
-func (s *SupabaseClient) UpdateUser(uuid string, targetUser *User) (*User, error) {
+func (s *SupabaseClient) UpdateUser(uuid string, targetUser *model.User) (*model.User, error) {
 	// the user can only change the following details: name, totalpoints
 	client := s.GetClient()
-	data, count, err := client.From(UserTableName).Update(map[string]any{
-		"name": targetUser.Name,
+	data, count, err := client.From(model.UserTableName).Update(map[string]any{
+		"name":         targetUser.Name,
 		"total_points": targetUser.TotalPoints,
 	}, "", "exact").Eq("uuid", uuid).Execute()
 	if err != nil {
@@ -155,9 +157,9 @@ func (s *SupabaseClient) UpdateUser(uuid string, targetUser *User) (*User, error
 	} else if count == 0 {
 		return nil, errors.New("error updating user details: no users have been changed")
 	}
-	
+
 	// unmarshal user returned by supabase
-	result := []User{}
+	result := []model.User{}
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
 	} else if len(result) == 0 {

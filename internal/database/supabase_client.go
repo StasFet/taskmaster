@@ -1,7 +1,8 @@
-package internal
+package database
 
 import (
 	"os"
+
 	"github.com/supabase-community/supabase-go"
 )
 

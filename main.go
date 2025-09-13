@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 	i "taskmaster/internal"
+	db "taskmaster/internal/database"
+	sec "taskmaster/internal/security"
 	"taskmaster/logger"
 	"time"
 	"unicode/utf8"
@@ -19,7 +21,7 @@ func main() {
 	}
 
 	// Connect to supabase bucket
-	sbClient, err := i.CreateSupabaseClient()
+	sbClient, err := db.CreateSupabaseClient()
 	if err != nil {
 		logger.GEN.Fatalf("Error creating supabase client: %v\n", err)
 	}
@@ -32,20 +34,20 @@ func main() {
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
+		MaxAge:           6 * time.Hour,
 	}))
 
 	// declare handler groups/routing
 	tasksGroup := ginClient.Group("/api/v1/tasks")
 	{
-		tasksGroup.GET("/", i.JWTValidatorMiddleware(), i.HandleGetTasksByUUID(sbClient))
-		tasksGroup.POST("/", i.JWTValidatorMiddleware(), i.HandlePostTask(sbClient))
+		tasksGroup.GET("/", sec.JWTValidatorMiddleware(), i.HandleGetTasksByUUID(sbClient))
+		tasksGroup.POST("/", sec.JWTValidatorMiddleware(), i.HandlePostTask(sbClient))
 	}
 
 	usersGroup := ginClient.Group("/api/v1/users")
 	{
-		usersGroup.GET("/", i.JWTValidatorMiddleware(), i.HandleGetUser(sbClient))
-		usersGroup.PUT("/", i.JWTValidatorMiddleware(), i.HandlePutUser(sbClient))
+		usersGroup.GET("/", sec.JWTValidatorMiddleware(), i.HandleGetUser(sbClient))
+		usersGroup.PUT("/", sec.JWTValidatorMiddleware(), i.HandlePutUser(sbClient))
 	}
 
 	port := os.Getenv("PORT")

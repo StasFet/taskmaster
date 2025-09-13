@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	db "taskmaster/internal/database"
+	model "taskmaster/internal/models"
 )
 
 func respondError(c *gin.Context, code int, text string) {
@@ -15,7 +17,7 @@ func respondError(c *gin.Context, code int, text string) {
 }
 
 // handle GET /api/v1/tasks/byuser/:id
-func HandleGetTasksByUUID(s *SupabaseClient) gin.HandlerFunc {
+func HandleGetTasksByUUID(s *db.SupabaseClient) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// extract user id from request parameters
 		uuid := c.GetString("validated_uuid")
@@ -36,13 +38,13 @@ func HandleGetTasksByUUID(s *SupabaseClient) gin.HandlerFunc {
 }
 
 // handle POST /api/v1/tasks - Create new task
-func HandlePostTask(s *SupabaseClient) gin.HandlerFunc {
+func HandlePostTask(s *db.SupabaseClient) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		newTask := Task{}
+		newTask := model.Task{}
 		// bind the json of the request to a Task object
 		if err := c.BindJSON(&newTask); err != nil {
 			respondError(c, http.StatusBadRequest, "error creating task from request parameters")
-			logger.API.Printf("error binding request params to json: %v\n", err)
+			logger.API.Printf("Error binding request params to json: %v\n", err)
 			return
 		}
 
@@ -52,7 +54,7 @@ func HandlePostTask(s *SupabaseClient) gin.HandlerFunc {
 		_, err := s.CreateNewTask(&newTask)
 		if err != nil {
 			respondError(c, http.StatusInternalServerError, "error creating new task on supabase")
-			logger.DB.Printf("error creating new task into supabase: %v\n", err)
+			logger.DB.Printf("Error creating new task into supabase: %v\n", err)
 			return
 		}
 		c.JSON(http.StatusCreated, newTask)

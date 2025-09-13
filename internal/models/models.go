@@ -1,4 +1,4 @@
-package internal
+package models
 
 import "time"
 
@@ -11,7 +11,7 @@ type Task struct {
 	DueDate     time.Time `json:"due_date,omitempty"`
 	Priority    int       `json:"priority,omitempty"`
 	Points      int       `json:"points,omitempty"`
-	UserID      int       `json:"user_id,omitempty"`
+	OwnerUUID   int       `json:"owner_uuid,omitempty"`
 	CreatedAt   time.Time `json:"created_at,omitempty"`
 }
 
