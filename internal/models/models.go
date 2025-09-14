@@ -5,14 +5,15 @@ import "time"
 const TaskTableName = "tasks"
 
 type Task struct {
-	ID          int       `json:"-"`
+	ID          int       `json:"id,omitempty"`
 	Title       string    `json:"title,omitempty"`
 	Description string    `json:"description,omitempty"`
 	DueDate     time.Time `json:"due_date,omitempty"`
 	Priority    int       `json:"priority,omitempty"`
 	Points      int       `json:"points,omitempty"`
-	OwnerUUID   int       `json:"owner_uuid,omitempty"`
+	OwnerUUID   string    `json:"owner_uuid,omitempty"`
 	CreatedAt   time.Time `json:"created_at,omitempty"`
+	Completed   bool      `json:"completed"`
 }
 
 const UserTableName = "users"
@@ -21,7 +22,7 @@ type User struct {
 	Name        string    `json:"name,omitempty"`
 	Email       string    `json:"email,omitempty"`
 	UUID        string    `json:"uuid,omitempty"`
-	TotalPoints int       `json:"total_points,omitempty"`
+	TotalPoints int64     `json:"total_points"`
 	CreatedAt   time.Time `json:"created_at,omitempty"`
 }
 

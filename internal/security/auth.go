@@ -1,7 +1,6 @@
 package security
 
 import (
-	"encoding/json"
 	"net/http"
 	"os"
 	"strings"
@@ -90,10 +89,10 @@ func JWTValidatorMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		logToken, err := json.Marshal(parsedToken)
-		if err == nil {
-			logger.API.Printf("Extracted logToken: %s", logToken)
-		}
+		// logToken, err := json.Marshal(parsedToken)
+		// if err == nil {
+		// 	logger.API.Printf("Extracted logToken: %s", logToken)
+		// }
 
 		// check expiry etc
 		if isValid, err := ValidateClaims(parsedToken); !isValid || err != nil {
@@ -122,7 +121,6 @@ func JWTValidatorMiddleware() gin.HandlerFunc {
 			}
 		}
 		c.Set("validated_name", name)
-		logger.GEN.Printf("Token validated successfully! email: %s\n", email)
 		c.Next()
 	}
 }

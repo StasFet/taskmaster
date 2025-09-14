@@ -89,7 +89,7 @@ func (s *SupabaseClient) GetTaskById(id int) (*model.Task, error) {
 // Returns a slice of tasks associated with the user with the given id
 func (s *SupabaseClient) GetTasksByUUID(uuid string) (*[]model.Task, error) {
 	client := s.GetClient()
-	data, _, err := client.From(model.TaskTableName).Select("*", "exact", false).Eq("owner_uuid", uuid).Execute()
+	data, _, err := client.From(model.TaskTableName).Select("*", "exact", false).Eq("owner_uuid", uuid).Eq("completed", "FALSE").Execute()
 	if err != nil {
 		return nil, err
 	}
@@ -117,16 +117,17 @@ func (s *SupabaseClient) CreateNewTask(newTask *model.Task) (*model.Task, error)
 }
 
 // Updates the task with the given id to match the given task
-func (s *SupabaseClient) UpdateTask(id int, targetTask *model.Task) (*model.Task, error) {
+func (s *SupabaseClient) UpdateTask(targetTask *model.Task) (*model.Task, error) {
 	// important to note that the user can only change the following values: title, description, due date, priority and points
 	client := s.GetClient()
-	id_str := strconv.Itoa(id)
+	id_str := strconv.Itoa(targetTask.ID)
 	data, count, err := client.From(model.TaskTableName).Update(map[string]any{
 		"title":       targetTask.Title,
 		"description": targetTask.Description,
 		"due_date":    targetTask.DueDate,
 		"priority":    targetTask.Priority,
 		"points":      targetTask.Points,
+		"completed":   targetTask.Completed,
 	}, "", "exact").Eq("id", id_str).Execute()
 
 	if err != nil {

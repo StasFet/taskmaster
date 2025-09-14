@@ -42,6 +42,7 @@ func main() {
 	{
 		tasksGroup.GET("/", sec.JWTValidatorMiddleware(), i.HandleGetTasksByUUID(sbClient))
 		tasksGroup.POST("/", sec.JWTValidatorMiddleware(), i.HandlePostTask(sbClient))
+		tasksGroup.PUT("/", sec.JWTValidatorMiddleware(), i.HandlePutTask(sbClient))
 	}
 
 	usersGroup := ginClient.Group("/api/v1/users")

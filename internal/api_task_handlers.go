@@ -5,9 +5,10 @@ import (
 	"taskmaster/logger"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	db "taskmaster/internal/database"
 	model "taskmaster/internal/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func respondError(c *gin.Context, code int, text string) {
@@ -50,6 +51,8 @@ func HandlePostTask(s *db.SupabaseClient) gin.HandlerFunc {
 
 		// ensure the CreatedAt date is correct
 		newTask.CreatedAt = time.Now()
+		newTask.OwnerUUID = c.GetString("validated_uuid")
+		newTask.Completed = false
 
 		_, err := s.CreateNewTask(&newTask)
 		if err != nil {
@@ -58,5 +61,27 @@ func HandlePostTask(s *db.SupabaseClient) gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusCreated, newTask)
+	}
+}
+
+// handlePutTask
+func HandlePutTask(s *db.SupabaseClient) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		updatedTask := model.Task{}
+		if err := c.BindJSON(&updatedTask); err != nil {
+			respondError(c, http.StatusBadRequest, "error binding updated task json")
+			logger.API.Printf("Error binding json for PUT task request: %v\n", err)
+			return
+		}
+
+		updatedTask.OwnerUUID = c.GetString("validated_uuid")
+
+		_, err := s.UpdateTask(&updatedTask)
+		if err != nil {
+			respondError(c, http.StatusInternalServerError, "error updating task")
+			logger.DB.Printf("Error updating task: %v\n", err)
+			return
+		}
+		c.JSON(http.StatusOK, nil)
 	}
 }

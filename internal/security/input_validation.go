@@ -26,5 +26,9 @@ func ValidateTask(t *model.Task) (bool, error) {
 	}
 
 	// check priority
-	if !(t.Priority >= 0 && t.Priority <= 500)
+	if !(t.Priority >= 0 && t.Priority <= 500) {
+		return false, nil
+	}
+
+	return true, nil
 }

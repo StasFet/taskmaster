@@ -35,7 +35,7 @@ func HandleGetUser(s *db.SupabaseClient) gin.HandlerFunc {
 			}
 		}
 
-		c.JSON(http.StatusFound, user)
+		c.JSON(http.StatusOK, user)
 	}
 }
 
