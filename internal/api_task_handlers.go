@@ -54,13 +54,13 @@ func HandlePostTask(s *db.SupabaseClient) gin.HandlerFunc {
 		newTask.OwnerUUID = c.GetString("validated_uuid")
 		newTask.Status = "INCOMPLETE"
 
-		_, err := s.CreateNewTask(&newTask)
+		returnedTask, err := s.CreateNewTask(&newTask)
 		if err != nil {
 			respondError(c, http.StatusInternalServerError, "error creating new task on supabase")
 			logger.DB.Printf("Error creating new task into supabase: %v\n", err)
 			return
 		}
-		c.JSON(http.StatusCreated, newTask)
+		c.JSON(http.StatusCreated, *returnedTask)
 	}
 }
 
@@ -76,13 +76,13 @@ func HandlePutTask(s *db.SupabaseClient) gin.HandlerFunc {
 
 		updatedTask.OwnerUUID = c.GetString("validated_uuid")
 
-		_, err := s.UpdateTask(&updatedTask)
+		newTask, err := s.UpdateTask(&updatedTask)
 		if err != nil {
 			respondError(c, http.StatusInternalServerError, "error updating task")
 			logger.DB.Printf("Error updating task: %v\n", err)
 			return
 		}
-		c.JSON(http.StatusOK, nil)
+		c.JSON(http.StatusOK, newTask)
 	}
 }
 
