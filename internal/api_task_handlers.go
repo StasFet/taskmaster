@@ -52,7 +52,7 @@ func HandlePostTask(s *db.SupabaseClient) gin.HandlerFunc {
 		// ensure the CreatedAt date is correct
 		newTask.CreatedAt = time.Now()
 		newTask.OwnerUUID = c.GetString("validated_uuid")
-		newTask.Completed = false
+		newTask.Status = "INCOMPLETE"
 
 		_, err := s.CreateNewTask(&newTask)
 		if err != nil {
@@ -80,6 +80,22 @@ func HandlePutTask(s *db.SupabaseClient) gin.HandlerFunc {
 		if err != nil {
 			respondError(c, http.StatusInternalServerError, "error updating task")
 			logger.DB.Printf("Error updating task: %v\n", err)
+			return
+		}
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
+// handle DELETE task
+func HandleDeleteTask(s *db.SupabaseClient) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		uuid := c.GetString("validated_uuid")
+		err := s.DeleteTask(id, uuid)
+		if err != nil {
+			respondError(c, http.StatusInternalServerError, "error deleting task")
+			logger.DB.Printf("Error deleting task with id %v: %v", id, err)
+			c.Abort()
 			return
 		}
 		c.JSON(http.StatusOK, nil)

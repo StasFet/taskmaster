@@ -35,20 +35,21 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           6 * time.Hour,
-	}))
+	}), sec.JWTValidatorMiddleware())
 
 	// declare handler groups/routing
 	tasksGroup := ginClient.Group("/api/v1/tasks")
 	{
-		tasksGroup.GET("/", sec.JWTValidatorMiddleware(), i.HandleGetTasksByUUID(sbClient))
-		tasksGroup.POST("/", sec.JWTValidatorMiddleware(), i.HandlePostTask(sbClient))
-		tasksGroup.PUT("/", sec.JWTValidatorMiddleware(), i.HandlePutTask(sbClient))
+		tasksGroup.GET("/", i.HandleGetTasksByUUID(sbClient))
+		tasksGroup.POST("/", i.HandlePostTask(sbClient))
+		tasksGroup.PUT("/", i.HandlePutTask(sbClient))
+		tasksGroup.DELETE("/:id", i.HandleDeleteTask(sbClient))
 	}
 
 	usersGroup := ginClient.Group("/api/v1/users")
 	{
-		usersGroup.GET("/", sec.JWTValidatorMiddleware(), i.HandleGetUser(sbClient))
-		usersGroup.PUT("/", sec.JWTValidatorMiddleware(), i.HandlePutUser(sbClient))
+		usersGroup.GET("/", i.HandleGetUser(sbClient))
+		usersGroup.PUT("/", i.HandlePutUser(sbClient))
 	}
 
 	port := os.Getenv("PORT")

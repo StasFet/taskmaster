@@ -122,12 +122,12 @@ func (s *SupabaseClient) UpdateTask(targetTask *model.Task) (*model.Task, error)
 	client := s.GetClient()
 	id_str := strconv.Itoa(targetTask.ID)
 	data, count, err := client.From(model.TaskTableName).Update(map[string]any{
-		"title":       targetTask.Title,
-		"description": targetTask.Description,
-		"due_date":    targetTask.DueDate,
-		"priority":    targetTask.Priority,
-		"points":      targetTask.Points,
-		"completed":   targetTask.Completed,
+		"title":             targetTask.Title,
+		"description":       targetTask.Description,
+		"due_date":          targetTask.DueDate,
+		"priority":          targetTask.Priority,
+		"points":            targetTask.Points,
+		"completion_status": targetTask.Status,
 	}, "", "exact").Eq("id", id_str).Execute()
 
 	if err != nil {
@@ -167,4 +167,16 @@ func (s *SupabaseClient) UpdateUser(uuid string, targetUser *model.User) (*model
 		return nil, errors.New("updated user")
 	}
 	return &result[0], nil
+}
+
+// Deletes the task with the given id
+func (s *SupabaseClient) DeleteTask(id string, owner_uuid string) error {
+	client := s.GetClient()
+	_, count, err := client.From(model.TaskTableName).Delete("", "exact").Eq("id", id).Eq("owner_uuid", owner_uuid).Execute()
+	if err != nil {
+		return err
+	} else if count != 1 {
+		return errors.New("the number of matching tasks to delete was is not 1")
+	}
+	return nil
 }

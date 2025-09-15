@@ -5,25 +5,25 @@ import "time"
 const TaskTableName = "tasks"
 
 type Task struct {
-	ID          int       `json:"id,omitempty"`
-	Title       string    `json:"title,omitempty"`
-	Description string    `json:"description,omitempty"`
-	DueDate     time.Time `json:"due_date,omitempty"`
-	Priority    int       `json:"priority,omitempty"`
-	Points      int       `json:"points,omitempty"`
-	OwnerUUID   string    `json:"owner_uuid,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
-	Completed   bool      `json:"completed"`
+	ID          int       `json:"id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	DueDate     time.Time `json:"due_date"`
+	Priority    int       `json:"priority"`
+	Points      int       `json:"points"`
+	OwnerUUID   string    `json:"owner_uuid"`
+	CreatedAt   time.Time `json:"created_at"`
+	Status      string    `json:"completion_status"`
 }
 
 const UserTableName = "users"
 
 type User struct {
-	Name        string    `json:"name,omitempty"`
-	Email       string    `json:"email,omitempty"`
-	UUID        string    `json:"uuid,omitempty"`
+	Name        string    `json:"name"`
+	Email       string    `json:"email"`
+	UUID        string    `json:"uuid"`
 	TotalPoints int64     `json:"total_points"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 // Returns a boolean that is True if the due date of a task is past
