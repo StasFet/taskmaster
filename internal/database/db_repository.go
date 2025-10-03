@@ -89,7 +89,7 @@ func (s *SupabaseClient) GetTaskById(id int) (*model.Task, error) {
 // Returns a slice of tasks associated with the user with the given id
 func (s *SupabaseClient) GetTasksByUUID(uuid string) (*[]model.Task, error) {
 	client := s.GetClient()
-	data, _, err := client.From(model.TaskTableName).Select("*", "exact", false).Eq("owner_uuid", uuid).Eq("completed", "FALSE").Execute()
+	data, _, err := client.From(model.TaskTableName).Select("*", "exact", false).Eq("owner_uuid", uuid).Execute()
 	if err != nil {
 		return nil, err
 	}
